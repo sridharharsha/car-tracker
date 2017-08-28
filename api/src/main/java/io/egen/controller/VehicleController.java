@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-@CrossOrigin(origins = "http://mocker.egen.io", maxAge = 3600)
+@CrossOrigin(origins = {"http://mocker.egen.io","http://localhost:4200","http://localhost:8080"}, maxAge = 3600)
 @RestController
 @RequestMapping(value = "/vehicles")
 public class VehicleController {
@@ -19,7 +19,8 @@ public class VehicleController {
     @Autowired
     VehicleService service;
 
-    HashMap<String,Vehicle> dbSavedVehiclesMap = new HashMap<String, Vehicle>();
+    HashMap<String,Vehicle> dbSavedVehiclesMap = new HashMap<>();
+
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public List<Vehicle> findAll(){

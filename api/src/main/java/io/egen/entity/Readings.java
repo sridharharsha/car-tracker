@@ -7,9 +7,9 @@ import java.util.UUID;
 @Entity
 @NamedQueries({
         @NamedQuery(name = "Readings.findAll",
-                query = "SELECT read FROM Readings read "),
-        @NamedQuery(name = "Readings.findByVin",
-                query = "SELECT read FROM Readings read WHERE read.vin=:paramVin")
+                query = "SELECT read FROM Readings read WHERE read.priority = 'HIGH'"),
+        @NamedQuery(name = "Readings.findAllByVin",
+                query = "SELECT read FROM Readings read WHERE read.vin=:paramVin AND read.priority is not null")
 })
 
 public class Readings {
@@ -18,7 +18,7 @@ public class Readings {
     @Column(columnDefinition = "VARCHAR(36)")
     private String id;
 
-    @Column(unique = true)
+
     private String vin;
 
     private Double latitude;
@@ -31,6 +31,8 @@ public class Readings {
     private Boolean engineCoolantLow;
     private Boolean cruiseControlOn;
     private Integer engineRpm;
+    private String priority;
+    private String alertMsg;
 
     @OneToOne(cascade = CascadeType.ALL)
     private Tires tires;
@@ -143,6 +145,22 @@ public class Readings {
         this.tires = tires;
     }
 
+    public String getPriority() {
+        return priority;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
+    }
+
+    public String getAlertMsg() {
+        return alertMsg;
+    }
+
+    public void setAlertMsg(String alertMsg) {
+        this.alertMsg = alertMsg;
+    }
+
     @Override
     public String toString() {
         return "Readings{" +
@@ -159,6 +177,7 @@ public class Readings {
                 ", cruiseControlOn=" + cruiseControlOn +
                 ", engineRpm=" + engineRpm +
                 ", tires=" + tires +
+                ", priority=" + priority +
                 '}';
     }
 }

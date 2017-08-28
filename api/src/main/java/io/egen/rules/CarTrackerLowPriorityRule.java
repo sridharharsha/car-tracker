@@ -1,5 +1,6 @@
 package io.egen.rules;
 
+import io.egen.entity.Readings;
 import io.egen.entity.Tires;
 import org.easyrules.annotation.Action;
 import org.easyrules.annotation.Condition;
@@ -15,6 +16,9 @@ public class CarTrackerLowPriorityRule {
     private Boolean flagTire;
     private Boolean flagEngineCoolant;
     private Boolean flagEngineLight;
+    private String message;
+
+
 
     @Condition
     public boolean checkInput() {
@@ -44,16 +48,21 @@ public class CarTrackerLowPriorityRule {
     }
 
     @Action
-    public void messageToPrint() throws Exception {
+    public String messageToPrint() throws Exception {
 
         if(flagTire)
-            System.out.println("Low priority! one of the tires doesn't have the required air in the tube.");
+            this.message = "Low priority! one of the tires doesn't have the required air in the tube.";
+
 
         if(flagEngineCoolant)
-            System.out.println("Low priority! the coolant in the engine is low.");
+            this.message = "Low priority! the coolant in the engine is low.";
 
         if(flagEngineLight)
-            System.out.println("Low priority! the check engine light is on.");
+            this.message = "Low priority! the check engine light is on.";
+
+        return this.message;
+
+
     }
 
     public void setInput(Tires tires, Boolean engineCoolantLow, Boolean checkEngineLightOn) {
@@ -63,6 +72,7 @@ public class CarTrackerLowPriorityRule {
         this.flagTire = Boolean.FALSE;
         this.flagEngineCoolant = Boolean.FALSE;
         this.flagEngineLight = Boolean.FALSE;
+
     }
 
     @Priority

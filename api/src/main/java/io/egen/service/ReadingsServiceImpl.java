@@ -54,10 +54,10 @@ public class ReadingsServiceImpl implements ReadingsService{
 
     }
 
-    @Transactional
-    public Readings findByVin(String vin) {
-        Readings existing = repository.findByVin(vin);
-        if(existing == null){
+    @Transactional(readOnly = true)
+    public List<Readings> findAllByVin(String vin) {
+        List<Readings> existing = repository.findAllByVin(vin);
+        if(existing == null || existing.size() == 0){
             throw new ResourceNotFoundException("Readings with vin number " + vin + " doesn't exist.");
         }
         return existing;

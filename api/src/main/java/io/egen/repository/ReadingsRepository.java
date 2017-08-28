@@ -16,6 +16,6 @@ public interface ReadingsRepository {
 
     void delete(Readings readings);
 
-    Readings findByVin(String vin);
+    List<Readings> findAllByVin(String vin);
 
 }

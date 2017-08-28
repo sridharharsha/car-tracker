@@ -15,6 +15,6 @@ public interface ReadingsService {
 
     void delete(String id);
 
-    Readings findByVin(String vin);
+    List<Readings> findAllByVin(String vin);
 
 }

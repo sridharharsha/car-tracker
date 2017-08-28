@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-@CrossOrigin(origins = "http://mocker.egen.io", maxAge = 3600)
+@CrossOrigin(origins = {"http://mocker.egen.io","http://localhost:4200","http://localhost:8080"}, maxAge = 3600)
+
 @RestController
 @RequestMapping(value = "/readings")
 public class ReadingsController {
@@ -27,11 +28,7 @@ public class ReadingsController {
     @Autowired
     VehicleService vehicleService;
 
-    Set<String> dbSavedReadingsSet = new HashSet<>();
-
     RulesEngine rulesEngine = RulesEngineBuilder.aNewRulesEngine().build();
-
-
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public List<Readings> findAll(){
@@ -39,41 +36,49 @@ public class ReadingsController {
     }
 
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Readings findOne(@PathVariable("id") String readId){
-        return service.findOne(readId);
-    }
+//    @RequestMapping(method = RequestMethod.GET, value = "/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+//    public Readings findOne(@PathVariable("id") String readId){
+//        return service.findOne(readId);
+//    }
 
 
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Readings create(@RequestBody Readings readings){
+    public Readings create(@RequestBody Readings readings) throws Exception {
 
         Vehicle vehicle = vehicleService.findByVin(readings.getVin());
 
         CarTrackerHighPriorityRule carTrackerHighPriorityRule = new CarTrackerHighPriorityRule();
         carTrackerHighPriorityRule.setInput(readings.getEngineRpm(),vehicle.getRedlineRpm());
+        if(carTrackerHighPriorityRule.checkInput()){
+            readings.setPriority("HIGH");
+            readings.setAlertMsg(carTrackerHighPriorityRule.messageToPrint());
+        }
+
+
 
         CarTrackerMediumPriorityRule carTrackerMediumPriorityRule = new CarTrackerMediumPriorityRule();
         carTrackerMediumPriorityRule.setInput(vehicle.getMaxFuelVolume(),readings.getFuelVolume());
+        if(carTrackerMediumPriorityRule.checkInput()){
+            readings.setPriority("MEDIUM");
+            readings.setAlertMsg(carTrackerMediumPriorityRule.messageToPrint());
+        }
+
 
         CarTrackerLowPriorityRule carTrackerLowPriorityRule = new CarTrackerLowPriorityRule();
         carTrackerLowPriorityRule.setInput(readings.getTires(),readings.getEngineCoolantLow(),readings.getCheckEngineLightOn());
+
+        if(carTrackerLowPriorityRule.checkInput()){
+            readings.setPriority("LOW");
+            readings.setAlertMsg(carTrackerLowPriorityRule.messageToPrint());
+        }
+
 
         rulesEngine.registerRule(carTrackerMediumPriorityRule);
         rulesEngine.registerRule(carTrackerHighPriorityRule);
         rulesEngine.registerRule(carTrackerLowPriorityRule);
         rulesEngine.fireRules();
 
-
-        if(dbSavedReadingsSet.size() > 0 && dbSavedReadingsSet.contains(readings.getVin())){
-            Readings existing = service.findByVin(readings.getVin());
-            update(existing);
-        }else{
-            dbSavedReadingsSet.add(readings.getVin());
-            return service.create(readings);
-        }
-
-        return null;
+        return service.create(readings);
 
     }
 
@@ -89,5 +94,12 @@ public class ReadingsController {
         service.delete(readId);
 
     }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/{vin}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public List<Readings> findAllByVin(@PathVariable("vin") String vin){
+        System.out.println(service.findAllByVin(vin));
+        return service.findAllByVin(vin);
+    }
+
 
 }

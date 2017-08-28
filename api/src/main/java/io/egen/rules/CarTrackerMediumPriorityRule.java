@@ -1,5 +1,6 @@
 package io.egen.rules;
 
+import io.egen.entity.Readings;
 import org.easyrules.annotation.Action;
 import org.easyrules.annotation.Condition;
 import org.easyrules.annotation.Priority;
@@ -10,6 +11,8 @@ public class CarTrackerMediumPriorityRule {
 
     private Integer maxFuelVolume;
     private Integer fuelVolume;
+    private String message;
+
 
     @Condition
     public boolean checkInput() {
@@ -22,14 +25,18 @@ public class CarTrackerMediumPriorityRule {
     }
 
     @Action
-    public void messageToPrint() throws Exception {
+    public String messageToPrint() throws Exception {
 
-        System.out.println("Medium priority! your fuel tank is almost full.");
+        this.message = "Medium priority! your fuel tank is almost full.";
+
+        return this.message;
+
     }
 
     public void setInput(Integer maxFuelVolume,Integer fuelVolume) {
         this.maxFuelVolume = maxFuelVolume;
         this.fuelVolume = fuelVolume;
+
     }
 
     @Priority
