@@ -1,0 +1,29 @@
+
+<hr>
+<table class="table">
+  <thead>
+  <tr>
+
+    <th>VIN</th>
+    <th>Priority</th>
+    <th>Message</th>
+    <th>Date</th>
+
+  </tr>
+  </thead>
+
+  <tbody>
+  <tr *ngFor="let alert of alerts">
+
+      <td>{{alert.vin}}</td>
+      <td>{{alert.priority}}</td>
+      <td>{{alert.alertMsg}}</td>
+      <td>{{alert.timestamp | date:'medium'}} </td>
+
+  </tr>
+  </tbody>
+
+</table>
+
+
+
